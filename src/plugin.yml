@@ -1,0 +1,34 @@
+main: cn.mcres.karlatemp.pdevtool.PDevTool
+name: PDevTool
+version: 1.0
+author: Karlatemp
+website: https://github.com/Karlatemp
+permissions:
+  pdevtool.command.psudo:
+    default: op
+  pdevtool.command.pshow:
+    default: op
+  pdevtool.command.pinfo:
+    default: op
+commands:
+  pexit:
+    description: Exit SUDO mode
+  psudo:
+    description: "Using SUDO mode to run a command."
+    usage: "/psudo -i | /psudo {command}"
+    permission: pdevtool.command.psudo
+    aliases:
+      - ps
+      - sud
+  pshow:
+    permission: pdevtool.command.pshow
+    aliases:
+      - psh
+    description: Show command's permission in invoking
+    usage: "/<command> {command}"
+  pinfo:
+    description: Show command's full info.
+    aliases:
+      - pi
+    permission: pdevtool.command.pinfo
+    usage: "/<command> {command}"
