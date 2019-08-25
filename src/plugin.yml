@@ -1,14 +1,18 @@
 main: cn.mcres.karlatemp.pdevtool.PDevTool
 name: PDevTool
-version: 1.0
+version: 1.2
 author: Karlatemp
 website: https://github.com/Karlatemp
 permissions:
-  pdevtool.command.psudo:
+  "pdevtool.command.psudo":
     default: op
-  pdevtool.command.pshow:
+  "pdevtool.command.pshow":
     default: op
-  pdevtool.command.pinfo:
+  "pdevtool.command.pinfo":
+    default: op
+  "pdevtool.command.pclass":
+    default: op
+  "pdevtool.command.pevent":
     default: op
 commands:
   pexit:
@@ -32,3 +36,13 @@ commands:
       - pi
     permission: pdevtool.command.pinfo
     usage: "/<command> {command}"
+  pclass:
+    description: Show class owner.
+    aliases:
+      - pcl
+    permission: pdevtool.command.pclass
+    usage: "/<command> {class}"
+  pevent:
+    description: Show event's event listeners
+    permission: pdevtool.command.pevent
+    usage: "/<command> {class}"

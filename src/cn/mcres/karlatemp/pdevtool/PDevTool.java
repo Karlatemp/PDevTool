@@ -2,20 +2,32 @@ package cn.mcres.karlatemp.pdevtool;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
+import org.bukkit.event.*;
+import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.permissions.PermissibleBase;
+import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.lang.ref.PhantomReference;
 import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.lang.reflect.Method;
+import java.util.*;
 
-public class PDevTool extends JavaPlugin {
+public class PDevTool extends JavaPlugin implements Listener, EventExecutor {
+    public static final Map<ClassLoader, Object> pluginMap = new HashMap<>();
+
     @Override
     public void onEnable() {
         getLogger().info("PDevTool was enabled.");
         getLogger().info("Author: Karlatemp QQ: 3279826484.");
+        for (Plugin p : getServer().getPluginManager().getPlugins()) load(p);
+        PluginEnableEvent.getHandlerList().register(new RegisteredListener(this, this, EventPriority.MONITOR, this, false));
+    }
+
+    private static void load(Plugin p) {
+        pluginMap.put(p.getClass().getClassLoader(), p);
     }
 
     private void show(Collection<String> a, CommandSender sender) {
@@ -192,10 +204,53 @@ public class PDevTool extends JavaPlugin {
                     }
                     sender.sendMessage("\u00a76========= " + cmd.getName() + " =========");
                 }
+                case "pclass": {
+                    if (args.length == 0) return false;
+                    final Class<?> clazz = Class.forName(String.join(" ", args));
+                    sender.sendMessage(clazz + "'s owner is " + pluginMap.get(clazz.getClassLoader()));
+                    break;
+                }
+                case "pevent": {
+                    if (args.length == 0) return false;
+                    final Class<?> search = Class.forName(String.join(" ", args));
+                    if (Event.class.isAssignableFrom(search)) {
+                        HandlerList list;
+                        try {
+                            list = (HandlerList) search.getMethod("getHandlerList").invoke(null);
+                        } catch (Throwable thr) {
+                            final Method met = search.getDeclaredMethod("getHandlerList");
+                            met.setAccessible(true);
+                            list = (HandlerList) met.invoke(null);
+                        }
+                        final RegisteredListener[] listeners = list.getRegisteredListeners();
+                        EventPriority last = null;
+                        sender.sendMessage(search + "'s event listeners:");
+                        for (RegisteredListener listener : listeners) {
+                            final EventPriority priority = listener.getPriority();
+                            if (last != priority) {
+                                sender.sendMessage("§6Priority: " + priority);
+                                last = priority;
+                            }
+                            sender.sendMessage("§b  " + listener.getPlugin() + "§f$§6" + listener.getListener().getClass());
+                        }
+                    } else {
+                        sender.sendMessage(search + " is not a event class.");
+                    }
+                }
             }
+        } catch (ClassNotFoundException cnfe) {
+            sender.sendMessage(cnfe.toString());
         } catch (Throwable thr) {
-            throw new CommandException(thr.getMessage(), thr);
+            sender.sendMessage("§cError: " + thr.toString() + "\n§cMore in console.");
+            throw new CommandException(thr.getLocalizedMessage(), thr);
         }
         return true;
+    }
+
+    @Override
+    public void execute(Listener listener, Event event) throws EventException {
+        if (event instanceof PluginEnableEvent) {
+            load(((PluginEnableEvent) event).getPlugin());
+        }
     }
 }
