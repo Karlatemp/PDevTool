@@ -1,5 +1,6 @@
 package cn.mcres.karlatemp.pdevtool;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.*;
 import org.bukkit.plugin.Plugin;
 
@@ -11,6 +12,7 @@ public class PBBride extends PermissibleBase {
     private final PermissibleBase parent;
     public boolean sudo = false;
     public Collection<String> permissions;
+    public CommandSender rt;
 
     public PermissibleBase getParent() {
         return parent;
@@ -38,6 +40,9 @@ public class PBBride extends PermissibleBase {
 
     @Override
     public boolean hasPermission(String inName) {
+        if (rt != null) {
+            rend(inName);
+        }
         if (permissions != null && inName != null) {
             permissions.add(inName);
         }
@@ -46,10 +51,17 @@ public class PBBride extends PermissibleBase {
 
     @Override
     public boolean hasPermission(Permission perm) {
+        if (rt != null) {
+            rend(perm.getName());
+        }
         if (permissions != null && perm != null) {
             permissions.add(perm.getName().toLowerCase());
         }
         return sudo || parent.hasPermission(perm);
+    }
+
+    private void rend(String perm) {
+        rt.sendMessage("§bPermission check: §r[§e" + perm + "§r]");
     }
 
     @Override

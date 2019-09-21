@@ -66,6 +66,21 @@ public class PDevTool extends JavaPlugin implements Listener, EventExecutor {
             Field fe = RefTool.getPermField(perser);
             PermissibleBase pb = (PermissibleBase) fe.get(perser);
             switch (command.getName().toLowerCase()) {
+                case "plog": {
+                    if (sender != perser) {
+                        sender.sendMessage("\u00a7cThis command cannot run with /minecraft:execute");
+                        return true;
+                    }
+                    if (pb instanceof PBBride) {
+                        ((PBBride) pb).rt = sender;
+                    } else {
+                        PBBride pbg = new PBBride(sender, pb);
+                        pbg.rt = sender;
+                        fe.set(sender, pbg);
+                    }
+                    sender.sendMessage("§bEnable Permission real-time check mode.");
+                    return true;
+                }
                 case "psudo": {
                     if (sender != perser) {
                         sender.sendMessage("\u00a7cThis command cannot run with /minecraft:execute");
@@ -128,6 +143,10 @@ public class PDevTool extends JavaPlugin implements Listener, EventExecutor {
                             sender.sendMessage("\u00a7cYou are not in SUDO Mode.");
                         }
                         pbb.sudo = false;
+                        if (pbb.rt != null) {
+                            sender.sendMessage("§6Disable Permission real-time check mode.");
+                            pbb.rt = null;
+                        }
                         if (pbb.permissions != null) {
                             sender.sendMessage("\u00a7cI am very sorry, but it cannot be closed due to the permission record status, but we have already exited SUDO mode for you.");
                             return true;

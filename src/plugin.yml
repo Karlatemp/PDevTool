@@ -1,6 +1,6 @@
 main: cn.mcres.karlatemp.pdevtool.PDevTool
 name: PDevTool
-version: 1.2
+version: 1.3
 author: Karlatemp
 website: https://github.com/Karlatemp
 permissions:
@@ -14,7 +14,16 @@ permissions:
     default: op
   "pdevtool.command.pevent":
     default: op
+  "pdevtool.command.plog":
+    default: op
 commands:
+  plog:
+    description: "Real-time output check permission"
+    permission: pedevtool.command.plog
+    usage: "/plog"
+    aliases:
+      - prend
+      - prt
   pexit:
     description: Exit SUDO mode
   psudo:
